@@ -43,7 +43,7 @@ app.get("/", (req, res) => {
 app.use(require('./routes'));
 
 app.listen(port, async () => {
-	console.log(`Example app listening at http://localhost:${port}`);
+	console.log(`Social Media App listening at http://localhost:${port}`);
 
 	// uncomment below code to drop & sync database from models
 	/* 
@@ -51,4 +51,7 @@ app.listen(port, async () => {
 		  console.log('Database synced.');
 	});
 	*/
+
+	await sequelize.authenticate();
+	console.log('Database connected.');
 })

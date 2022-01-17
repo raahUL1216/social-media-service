@@ -4,6 +4,7 @@
   "description": "APIs for twitter like socia media app",
   "main": "app.js",
   "scripts": {
+    "start": "app.js",
     "test": "npm test"
   },
   "keywords": [
