@@ -33,10 +33,6 @@ module.exports = (sequelize, DataTypes) => {
 			// can like post one time
 			this.hasOne(models.PostLikesUnlike, { foreignKey: 'user_id', targetKey: 'id' });
 		}
-
-		toJSON() {
-			return { ...this.get(), email: undefined }
-		}
 	}
 	User.init({
 		id: {
