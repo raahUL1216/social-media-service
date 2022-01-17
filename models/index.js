@@ -1,61 +1,37 @@
-const config = require("../config/db.config.js");
+'use strict';
 
-const Sequelize = require("sequelize");
-const sequelize = new Sequelize(
-	config.DB,
-	config.USER,
-	config.PASSWORD,
-	{
-		host: config.HOST,
-		dialect: config.dialect,
-		operatorsAliases: false,
-
-		pool: {
-			max: config.pool.max,
-			min: config.pool.min,
-			acquire: config.pool.acquire,
-			idle: config.pool.idle
-		}
-	}
-);
+const fs = require('fs');
+const path = require('path');
+const Sequelize = require('sequelize');
+const basename = path.basename(__filename);
+const env = process.env.NODE_ENV || 'development';
+const config = require(__dirname + '/../config/db.config.json')[env];
 
 const db = {};
 
-db.Sequelize = Sequelize;
+let sequelize;
+if (config.use_env_variable) {
+	sequelize = new Sequelize(process.env[config.use_env_variable], config);
+} else {
+	sequelize = new Sequelize(config.database, config.username, config.password, config);
+}
+
+fs
+	.readdirSync(__dirname)
+	.filter(file => {
+		return (file.indexOf('.') !== 0) && (file !== basename) && (file.slice(-3) === '.js');
+	})
+	.forEach(file => {
+		const model = require(path.join(__dirname, file))(sequelize, Sequelize.DataTypes);
+		db[model.name] = model;
+	});
+
+Object.keys(db).forEach(modelName => {
+	if (db[modelName].associate) {
+		db[modelName].associate(db);
+	}
+});
+
 db.sequelize = sequelize;
-
-db.authuser = require("./user/authuser.model")(sequelize, Sequelize);
-db.usermapping = require("./user/user_mapping.model")(sequelize, Sequelize);
-db.user = require("./user/user.model")(sequelize, Sequelize);
-
-db.post = require("./posts/posts.model")(sequelize, Sequelize);
-db.postlikesunlikes = require("./posts/post_likes_unlikes.model")(sequelize, Sequelize);
-db.postcomments = require("./posts/post_comments.model")(sequelize, Sequelize);
-
-// map authuser and user
-db.authuser.hasOne(db.usermapping, { foreignKey: 'authuser_id' });
-db.usermapping.belongsTo(db.authuser, { foreignKey: 'authuser_id' });
-db.user.hasOne(db.usermapping, { foreignKey: 'user_id' });
-db.usermapping.belongsTo(db.user, { foreignKey: 'user_id' });
-
-// map user with followers
-db.user.belongsToMany(db.user, { as: 'followers', through: "user_followers", foreignKey: "user_id" });
-db.user.belongsToMany(db.user, { as: 'following', through: "user_followers", foreignKey: "follower_id" });
-
-// map user with posts
-db.user.hasMany(db.post);
-db.post.belongsTo(db.user);
-
-// map post with comments
-db.post.hasMany(db.postcomments, { foreignKey: 'post_id' });
-db.postcomments.belongsTo(db.post, { foreignKey: 'post_id' });
-db.user.hasMany(db.postcomments, { foreignKey: 'user_id' });
-db.postcomments.belongsTo(db.user, { foreignKey: 'user_id' });
-
-// map post with likes
-db.post.hasMany(db.postlikesunlikes, { foreignKey: 'post_id' });
-db.postlikesunlikes.belongsTo(db.post, { foreignKey: 'post_id' });
-db.user.hasMany(db.postlikesunlikes, { foreignKey: 'user_id' });
-db.postlikesunlikes.belongsTo(db.user, { foreignKey: 'user_id' });
 
 module.exports = db;
