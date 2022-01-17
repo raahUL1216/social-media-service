@@ -1,0 +1,40 @@
+{
+  "name": "social-media-service",
+  "version": "1.0.0",
+  "description": "APIs for twitter like socia media app",
+  "main": "app.js",
+  "scripts": {
+    "test": "npm test"
+  },
+  "keywords": [
+    "node js",
+    "jwt",
+    "socia media app",
+    "twitter like app",
+    "express",
+    "postgresql"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/raahUL1216/social-media-service.git"
+  },
+  "author": "Rahul Chodvadiya",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/raahUL1216/social-media-service/issues"
+  },
+  "homepage": "https://github.com/raahUL1216/social-media-service#readme",
+  "dependencies": {
+    "bcryptjs": "^2.4.3",
+    "body-parser": "^1.19.1",
+    "cors": "^2.8.5",
+    "dotenv": "^12.0.4",
+    "errorhandler": "^1.5.1",
+    "express": "^4.17.2",
+    "express-jwt": "^6.1.0",
+    "jsonwebtoken": "^8.5.1",
+    "pg": "^8.7.1",
+    "pg-hstore": "^2.3.4",
+    "sequelize": "^6.13.0"
+  }
+}
