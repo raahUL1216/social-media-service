@@ -1,3 +1,3 @@
 module.exports = {
-	secret: 'authorization-secret-key'
+	secret: process.env.NODE_ENV === 'production' ? process.env.SECRET : 'secret'
 };

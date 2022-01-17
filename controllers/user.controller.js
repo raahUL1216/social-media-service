@@ -1,146 +1,96 @@
-// const db = require("../models");
-// const Tutorial = db.tutorials;
-// const Op = db.Sequelize.Op;
+const { user } = require('pg/lib/defaults');
+const userHelper = require('../helpers/user.helper');
 
-// Create and Save a new Tutorial
-exports.create = (req, res) => {
-	// Validate request
-	if (!req.body.title) {
-		res.status(400).send({
-			message: "Content can not be empty!"
-		});
-		return;
+exports.followUser = async (req, res) => {
+	const followableId = req.params.userId,
+		followerId = req.userId;
+
+	const isFollowerCreated = await userHelper.followUser(followableId, followerId);
+
+	if (!isFollowerCreated) {
+		return res.status(200).json({ message: `You are already following: ${followableId}` });
 	}
 
-	// Create a Tutorial
-	const tutorial = {
-		title: req.body.title,
-		description: req.body.description,
-		published: req.body.published ? req.body.published : false
-	};
+	return res.status(200).json({ message: `You are now following: ${followableId}` });
+}
 
-	// Save Tutorial in the database
-	Tutorial.create(tutorial)
-		.then(data => {
-			res.send(data);
-		})
-		.catch(err => {
-			res.status(500).send({
-				message:
-					err.message || "Some error occurred while creating the Tutorial."
-			});
-		});
-};
+exports.unfollowUser = async (req, res) => {
+	const followableId = req.params.userId,
+		followerId = req.userId;
 
-// Retrieve all Tutorials from the database.
-exports.findAll = (req, res) => {
-	const title = req.query.title;
-	var condition = title ? { title: { [Op.iLike]: `%${title}%` } } : null;
+	await userHelper.unfollowUser(followableId, followerId);
 
-	Tutorial.findAll({ where: condition })
-		.then(data => {
-			res.send(data);
-		})
-		.catch(err => {
-			res.status(500).send({
-				message:
-					err.message || "Some error occurred while retrieving tutorials."
-			});
-		});
-};
+	return res.status(200).json({ message: `You have unfollowed: ${followableId}` });
+}
 
-// Find a single Tutorial with an id
-exports.findOne = (req, res) => {
-	const id = req.params.id;
+exports.getUserProfile = async (req, res) => {
+	const userId = req.userId;
+	const user = await userHelper.getUserDetails(userId);
 
-	Tutorial.findByPk(id)
-		.then(data => {
-			res.send(data);
-		})
-		.catch(err => {
-			res.status(500).send({
-				message: "Error retrieving Tutorial with id=" + id
-			});
-		});
-};
+	return res.status(200).json({ user: user });
+}
 
-// Update a Tutorial by the id in the request
-exports.update = (req, res) => {
-	const id = req.params.id;
+exports.createPost = async (req, res) => {
+	const postDetails = req.body,
+		userId = req.userId;
+	const post = await userHelper.createPost(userId, postDetails);
 
-	Tutorial.update(req.body, {
-		where: { id: id }
-	})
-		.then(num => {
-			if (num == 1) {
-				res.send({
-					message: "Tutorial was updated successfully."
-				});
-			} else {
-				res.send({
-					message: `Cannot update Tutorial with id=${id}. Maybe Tutorial was not found or req.body is empty!`
-				});
-			}
-		})
-		.catch(err => {
-			res.status(500).send({
-				message: "Error updating Tutorial with id=" + id
-			});
-		});
-};
+	return res.status(200).json({ post: post });
+}
 
-// Delete a Tutorial with the specified id in the request
-exports.delete = (req, res) => {
-	const id = req.params.id;
 
-	Tutorial.destroy({
-		where: { id: id }
-	})
-		.then(num => {
-			if (num == 1) {
-				res.send({
-					message: "Tutorial was deleted successfully!"
-				});
-			} else {
-				res.send({
-					message: `Cannot delete Tutorial with id=${id}. Maybe Tutorial was not found!`
-				});
-			}
-		})
-		.catch(err => {
-			res.status(500).send({
-				message: "Could not delete Tutorial with id=" + id
-			});
-		});
-};
+exports.deletePost = async (req, res) => {
+	const postId = req.params.postId;
+	await userHelper.deletePost(postId);
 
-// Delete all Tutorials from the database.
-exports.deleteAll = (req, res) => {
-	Tutorial.destroy({
-		where: {},
-		truncate: false
-	})
-		.then(nums => {
-			res.send({ message: `${nums} Tutorials were deleted successfully!` });
-		})
-		.catch(err => {
-			res.status(500).send({
-				message:
-					err.message || "Some error occurred while removing all tutorials."
-			});
-		});
-};
+	return res.status(200).json({ message: `deleted post: ${postId}` });
+}
 
-// find all published Tutorial
-exports.findAllPublished = (req, res) => {
-	Tutorial.findAll({ where: { published: true } })
-		.then(data => {
-			res.send(data);
-		})
-		.catch(err => {
-			res.status(500).send({
-				message:
-					err.message || "Some error occurred while retrieving tutorials."
-			});
-		});
-};
+exports.likePost = async (req, res) => {
+	const postId = req.params.postId,
+		userId = req.userId;
+
+	const postLiked = await userHelper.likePost(userId, postId);
+
+	if (postLiked) {
+		return res.status(200).json({ message: `you have already liked post: ${postId}` });
+	}
+
+	return res.status(200).json({ message: `you have liked post: ${postId}` });
+}
+
+exports.unlikePost = async (req, res) => {
+	const postId = req.params.postId,
+		userId = req.userId;
+
+	await userHelper.unlikePost(userId, postId);
+
+	return res.status(200).json({ message: `you have unliked post: ${postId}` });
+}
+
+
+exports.commentOnPost = async (req, res) => {
+	const comment = req.body.comment,
+		postId = req.params.postId,
+		userId = req.userId;
+
+	const commentId = await userHelper.commentOnPost(userId, postId, comment);
+
+	return res.status(200).json({ commentId: commentId });
+}
+
+exports.getPost = async (req, res) => {
+	const postId = req.params.postId;
+	const post = await userHelper.getPost(postId);
+
+	return res.status(200).json({ post: post });
+}
+
+
+exports.getAllPost = async (req, res) => {
+	const userId = req.userId;
+
+	const posts = await userHelper.getAllPost(userId);
+
+	return res.status(200).json({ posts });
+}
