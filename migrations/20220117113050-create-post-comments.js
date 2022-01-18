@@ -10,14 +10,16 @@ module.exports = {
 			},
 			post_id: {
 				type: DataTypes.BIGINT,
-				allowNull: false
+				allowNull: false,
+				references: { model: 'posts', key: 'id' }
 			},
 			comment: {
 				type: DataTypes.STRING
 			},
 			user_id: {
 				type: DataTypes.BIGINT,
-				allowNull: false
+				allowNull: false,
+				references: { model: 'users', key: 'id' }
 			}
 		});
 	},
