@@ -1,27 +1,24 @@
 'use strict';
 module.exports = {
 	async up(queryInterface, DataTypes) {
-		await queryInterface.createTable('post_comments', {
+		await queryInterface.createTable('user_followers', {
 			id: {
+				type: DataTypes.BIGINT,
+				primaryKey: true,
 				allowNull: false,
 				autoIncrement: true,
-				primaryKey: true,
-				type: DataTypes.BIGINT
-			},
-			post_id: {
-				type: DataTypes.BIGINT,
-				allowNull: false
-			},
-			comment: {
-				type: DataTypes.STRING
 			},
 			user_id: {
+				type: DataTypes.BIGINT,
+				allowNull: false,
+			},
+			follower_id: {
 				type: DataTypes.BIGINT,
 				allowNull: false
 			}
 		});
 	},
 	async down(queryInterface, DataTypes) {
-		await queryInterface.dropTable('post_comments');
+		await queryInterface.dropTable('user_followers');
 	}
 };

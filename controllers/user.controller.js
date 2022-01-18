@@ -35,9 +35,8 @@ exports.createPost = async (req, res) => {
 		userId = req.userId;
 	const post = await userHelper.createPost(userId, postDetails);
 
-	return res.status(200).json({ post: post });
+	return res.status(200).json(post);
 }
-
 
 exports.deletePost = async (req, res) => {
 	const postId = req.params.postId;
@@ -68,7 +67,6 @@ exports.unlikePost = async (req, res) => {
 	return res.status(200).json({ message: `you have unliked post: ${postId}` });
 }
 
-
 exports.commentOnPost = async (req, res) => {
 	const comment = req.body.comment,
 		postId = req.params.postId,
@@ -92,5 +90,5 @@ exports.getAllPost = async (req, res) => {
 
 	const posts = await userHelper.getAllPost(userId);
 
-	return res.status(200).json({ posts });
+	return res.status(200).json(posts);
 }

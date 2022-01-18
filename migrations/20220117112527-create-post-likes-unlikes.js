@@ -1,28 +1,28 @@
 'use strict';
 module.exports = {
-	async up(queryInterface, Sequelize) {
-		await queryInterface.createTable('PostLikesUnlikes', {
+	async up(queryInterface, DataTypes) {
+		await queryInterface.createTable('post_likes_unlikes', {
 			id: {
+				type: DataTypes.BIGINT,
+				primaryKey: true,
 				allowNull: false,
 				autoIncrement: true,
-				primaryKey: true,
-				type: Sequelize.INTEGER
+			},
+			post_id: {
+				type: DataTypes.BIGINT,
+				allowNull: false,
+			},
+			user_id: {
+				type: DataTypes.BIGINT,
+				allowNull: false,
 			},
 			liketype: {
-				type: Sequelize.ENUM,
+				type: DataTypes.ENUM,
 				values: ['0', '1'],
-			},
-			createdAt: {
-				allowNull: false,
-				type: Sequelize.DATE
-			},
-			updatedAt: {
-				allowNull: false,
-				type: Sequelize.DATE
 			}
 		});
 	},
-	async down(queryInterface, Sequelize) {
-		await queryInterface.dropTable('PostLikesUnlikes');
+	async down(queryInterface, DataTypes) {
+		await queryInterface.dropTable('post_likes_unlikes');
 	}
 };

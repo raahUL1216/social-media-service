@@ -1,23 +1,17 @@
 'use strict';
-const {
-	Model
-} = require('sequelize');
+const { Model } = require('sequelize');
+
 module.exports = (sequelize, DataTypes) => {
 	class Post extends Model {
-		/**
-		 * Helper method for defining associations.
-		 * This method is not a part of Sequelize lifecycle.
-		 * The `models/index` file will call this method automatically.
-		 */
-		static associate({ User, PostComment, PostLikesUnlike }) {
+		static associate({ User, PostComment, PostLikeUnlike }) {
 			// post can have one owner
-			this.belongsTo(User, { foreignKey: 'user_id' });
+			this.belongsTo(User, { foreignKey: 'user_id', as: 'user' });
 
 			// post can have multiple comments
-			this.hasMany(PostComment, { foreignKey: 'post_id' });
+			this.hasMany(PostComment, { foreignKey: 'post_id', as: 'comments' });
 
 			// post can have multiple likes
-			this.hasMany(PostLikesUnlike, { foreignKey: 'post_id' });
+			this.hasMany(PostLikeUnlike, { foreignKey: 'post_id', as: 'postLikesUnlikes' });
 		}
 	}
 	Post.init({
@@ -38,8 +32,12 @@ module.exports = (sequelize, DataTypes) => {
 			defaultValue: DataTypes.NOW
 		}
 	}, {
+		hooks: {
+			afterCreate: (record) => {
+				delete record.dataValues.user_id;
+			},
+		},
 		sequelize,
-		schema: 'customer',
 		tableName: 'posts',
 		modelName: 'Post',
 		underscored: true

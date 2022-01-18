@@ -1,4 +1,4 @@
-const { sequelize, User, UserFollower, Post, PostLikesUnlike, PostComment } = require('../models')
+const { sequelize, User, UserFollower, Post, PostLikeUnlike, PostComment } = require('../models')
 
 exports.createUser = async (email, password) => {
 	let user, created;
@@ -92,8 +92,8 @@ exports.createPost = async (userId, postDetails) => {
 		console.log(error);
 		throw new Error('Error while creating post.');
 	}
-	return createdPost;
 
+	return createdPost;
 }
 
 exports.deletePost = async (postId) => {
@@ -113,7 +113,7 @@ exports.likePost = async (userId, postId) => {
 	let alreadyLiked = false;
 
 	try {
-		const isPostLikedBefore = await PostLikesUnlike.findOne({
+		const isPostLikedBefore = await PostLikeUnlike.findOne({
 			where: { post_id: postId, user_id: userId }
 		});
 
@@ -126,12 +126,11 @@ exports.likePost = async (userId, postId) => {
 				alreadyLiked = true;
 			}
 		} else {
-			await PostLikesUnlike.create({
+			await PostLikeUnlike.create({
 				post_id: postId,
 				user_id: userId,
 				liketype: '1'
 			});
-
 		}
 	} catch (error) {
 		console.log(error);
@@ -143,7 +142,7 @@ exports.likePost = async (userId, postId) => {
 
 exports.unlikePost = async (userId, postId) => {
 	try {
-		await PostLikesUnlike.update(
+		await PostLikeUnlike.update(
 			{ liketype: '0' },
 			{
 				where: { post_id: postId, user_id: userId }
@@ -184,17 +183,19 @@ exports.getPost = async (postId) => {
 			attributes: ['id'],
 			include: [
 				{
-					model: PostLikesUnlike,
+					model: PostLikeUnlike,
+					as: 'postLikesUnlikes',
 					required: false,
-					attributes: [[sequelize.fn("COUNT", sequelize.col("PostLikesUnlikes.id")), "likesCount"]]
+					attributes: [[sequelize.fn("COUNT", sequelize.col("postLikesUnlikes.id")), "likeCount"]]
 				},
 				{
 					model: PostComment,
+					as: 'comments',
 					required: false,
 					attributes: ['comment']
 				}
 			],
-			group: ['Post.id', 'PostLikesUnlikes.id', 'PostComments.id'],
+			group: ['Post.id', 'postLikesUnlikes.id', 'comments.id'],
 		});
 	} catch (error) {
 		console.log(error);
@@ -210,28 +211,30 @@ exports.getAllPost = async (userId) => {
 	try {
 		posts = await User.findAll({
 			where: { id: userId },
-			attributes: [],
+			attributes: ['id'],
 			include: [
 				{
 					model: Post,
+					as: 'posts',
 					required: true,
 					attributes: ['id', 'title', 'description', 'created_at'],
 					include: [
 						{
-							model: PostLikesUnlike,
+							model: PostLikeUnlike,
+							as: 'postLikesUnlikes',
 							required: false,
-							attributes: [[sequelize.fn("COUNT", sequelize.col("Posts->PostLikesUnlikes.id")), "likesCount"]]
+							attributes: [[sequelize.fn("COUNT", sequelize.col("posts->postLikesUnlikes.id")), "likesCount"]]
 						},
 						{
 							model: PostComment,
+							as: 'comments',
 							required: false,
 							attributes: ['comment']
 						}
-					],
-					group: ['Posts.id', 'Posts->PostLikesUnlikes.id', 'PostComment.id']
+					]
 				}
 			],
-			group: ['User.id', 'Posts.id', 'Posts->PostLikesUnlikes.id', 'Posts->PostComments.id'],
+			group: ['User.id', 'posts.id', 'posts->postLikesUnlikes.id', 'posts->comments.id'],
 		});
 	} catch (error) {
 		console.log(error);
