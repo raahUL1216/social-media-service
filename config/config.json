@@ -18,11 +18,14 @@
   },
   "production": {
     "use_env_variable": "DATABASE_URL",
-    "username": "root",
-    "password": null,
-    "database": "dfo9a7nhhob8un",
-    "host": "127.0.0.1",
     "dialect": "postgres",
+    "logging": false,
+    "dialectOptions": {
+      "ssl": {
+        "require": true,
+        "rejectUnauthorized": false
+      }
+    },
     "define": {
       "timestamps": false
     }
