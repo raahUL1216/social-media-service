@@ -1,16 +1,9 @@
 'use strict';
-const {
-	Model
-} = require('sequelize');
+const { Model } = require('sequelize');
 const bcrypt = require("bcryptjs");
 
 module.exports = (sequelize, DataTypes) => {
 	class User extends Model {
-		/**
-		 * Helper method for defining associations.
-		 * This method is not a part of Sequelize lifecycle.
-		 * The `models/index` file will call this method automatically.
-		 */
 		static associate(models) {
 			// can have many followers and following
 			this.belongsToMany(this, {
@@ -25,13 +18,13 @@ module.exports = (sequelize, DataTypes) => {
 			});
 
 			// can have many posts
-			this.hasMany(models.Post, { foreignKey: 'user_id' });
+			this.hasMany(models.Post, { foreignKey: 'user_id', as: 'posts' });
 
 			// can post more than one comment
 			this.hasMany(models.PostComment, { foreignKey: 'user_id' });
 
 			// can like post one time
-			this.hasOne(models.PostLikesUnlike, { foreignKey: 'user_id', targetKey: 'id' });
+			this.hasOne(models.PostLikeUnlike, { foreignKey: 'user_id', targetKey: 'id' });
 		}
 	}
 	User.init({
@@ -54,7 +47,6 @@ module.exports = (sequelize, DataTypes) => {
 		}
 	}, {
 		sequelize,
-		schema: 'customer',
 		tableName: 'users',
 		modelName: 'User',
 		underscored: true,
