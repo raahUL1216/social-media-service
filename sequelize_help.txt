@@ -1,0 +1,19 @@
+sequelize init
+//check config.json for proper database connection
+// it will create database with name specified in config
+sequelize db:create
+
+// generate model
+sequelize model:generate --name PostComments --attributes id:bigint,comment:string
+
+//connect postgres
+await sequelize.authenticate() //nodejs
+
+//migrate database change
+sequelize db:migrate
+
+//command to CRUD heroku database
+heroku pg:psql --app social-media-platform-apis postgresql-encircled-62459 < schema.sql (CREATE SCHEMA customer;)
+
+//command to run database migrations
+heroku run npx sequelize-cli db:migrate
