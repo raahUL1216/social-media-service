@@ -11,10 +11,12 @@ module.exports = {
 			post_id: {
 				type: DataTypes.BIGINT,
 				allowNull: false,
+				references: { model: 'posts', key: 'id' }
 			},
 			user_id: {
 				type: DataTypes.BIGINT,
 				allowNull: false,
+				references: { model: 'users', key: 'id' }
 			},
 			liketype: {
 				type: DataTypes.ENUM,
