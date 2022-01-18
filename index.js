@@ -48,7 +48,7 @@ app.listen(port, async () => {
 	// uncomment below code to drop & sync database from models
 	/* 
 	await sequelize.sync({ force: true, match: /_media_app$/ }).then(() => {
-		  console.log('Database synced.');
+		console.log('Database synced.');
 	});
 	*/
 

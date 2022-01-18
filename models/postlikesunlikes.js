@@ -16,7 +16,8 @@ module.exports = (sequelize, DataTypes) => {
 	}
 	PostLikesUnlike.init({
 		liketype: {
-			type: DataTypes.ENUM('0', '1'),
+			type: DataTypes.ENUM,
+			values: ['0', '1'],
 			allowNull: false
 		}
 	}, {
