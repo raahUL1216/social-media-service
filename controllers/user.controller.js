@@ -18,16 +18,17 @@ exports.followUser = async (req, res) => {
 }
 
 exports.unfollowUser = async (req, res) => {
-	try {
-		const followableId = req.params.userId,
-			followerId = req.userId;
+	const followableId = req.params.userId,
+		followerId = req.userId;
 
+	try {
 		await userHelper.unfollowUser(followableId, followerId);
-	} catch (error) {
+	}
+	catch (error) {
 		return res.status(500).json({ Error: error.message });
 	}
 
-	return res.status(200).json({ message: `You have unfollowed: ${followableId}` });
+	return res.status(200).json({ message: `You have unfollowed user: ${followableId}` });
 }
 
 exports.getUserProfile = async (req, res) => {
