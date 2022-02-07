@@ -13,8 +13,6 @@ This service is a collection of APIs for a twitter like social media platform. I
 - Show post
 - Show all user posts
 
-This service is built with Node.js & Postgresql.
-
 ## [Live Demo](https://social-media-platform-apis.herokuapp.com/)
 
 ### To run this project in development,
